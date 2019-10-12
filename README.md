@@ -20,5 +20,5 @@ cd src-cordova
 cordova platform add android
 cd ..
 npm run build
-npm run cordova-serve-android
+npm run cordova-build-android
 ```
