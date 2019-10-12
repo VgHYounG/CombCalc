@@ -15,8 +15,10 @@ npm start
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ### Build an android apk 
+```
 cd src-cordova
 cordova platform add android
 cd ..
 npm run build
 npm run cordova-serve-android
+```
