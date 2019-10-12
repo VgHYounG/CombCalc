@@ -15,15 +15,15 @@
 
 <script>
 import calculacombMain from "./components/calculacombMain";
-import header from "./components/header.vue";
-import footer from "./components/footer.vue";
+import vheader from "./components/header.vue";
+import vfooter from "./components/footer.vue";
 
 export default {
   name: "App",
   components: {
     calculacombMain,
-    header,
-    footer
+    vheader,
+    vfooter
   }
 };
 </script>
