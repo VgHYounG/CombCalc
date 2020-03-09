@@ -30,7 +30,7 @@
             </v-col>
             <v-col cols="6">
               <span v-text="item.valor + ' R$ - '"></span>
-          
+
               <span v-text="parseFloat(item.valor / item.litros).toFixed(2) + ' R$/L'"></span>
             </v-col>
             <v-col cols="2" class="c-align-right">
@@ -135,51 +135,19 @@
 </template>
 
 <script>
+import { excluir as excluirStorage } from "../js/storage.js";
+import { carregar as carregarStorage } from "../js/storage.js";
+import { adicionar as adicionarStorage } from "../js/storage.js";
+
 export default {
   methods: {
-    excluir(item) {
-      this.abastecimentos.splice(
-        this.abastecimentos.findIndex(x => x.id === item.id),
-        1
-      );
-      this.salvaLocal();
-      this.dialogExclude = false;
-      this.dialogEdit = false;
+    alerta(msg) {
+      msgAlerta = msg;
+      dialogAlerta = true;
     },
-    alterar(item) {
-      if (item.km.length <= 0 || parseFloat(item.km) <= 0)
-        this.Erros.edKm = true;
-      else this.Erros.edKm = false;
-      if (item.litros.length <= 0 || parseFloat(item.litros) <= 0)
-        this.Erros.edLitros = true;
-      else this.Erros.edLitros = false;
-      if (item.valor.length <= 0 || parseFloat(item.valor) <= 0)
-        this.Erros.edValor = true;
-      else this.Erros.edValor = false;
-      if (item.data.length <= 0) this.Erros.edData = true;
-      else this.Erros.edData = false;
-
-      if (
-        this.Erros.edKm ||
-        this.Erros.edLitros ||
-        this.Erros.edValor ||
-        this.Erros.edData
-      ) {
-        return;
-      }
-
-      let idxEdt = this.abastecimentos.findIndex(x => x.id === item.id);
-
-      this.abastecimentos[idxEdt] = item;
-
-      this.abastecimentos.sort(function(b, a) {
-        let bi = parseFloat(b.km);
-        let ai = parseFloat(a.km);
-        return ai < bi ? -1 : ai > bi ? 1 : 0;
-      });
-
-      this.salvaLocal();
-
+    excluir(item) {
+      this.ab = excluirStorage(item);
+      this.dialogExclude = false;
       this.dialogEdit = false;
     },
     adicionar() {
@@ -203,6 +171,20 @@ export default {
         return;
       }
 
+      let abastecimento = {
+        km: this.km,
+        litros: this.litros,
+        valor: this.valor,
+        data: this.data
+      };
+      
+      adicionarStorage("abastecimento", abastecimento);
+
+      this.km = "";
+      this.litros = "";
+      this.valor = "";
+      this.data = new Date().toLocaleDateString("pt-BR");
+
       if (this.abastecimentos.length > 0)
         if (parseFloat(this.km) <= parseFloat(this.abastecimentos[0].km)) {
           this.alerta(
@@ -210,41 +192,13 @@ export default {
           );
           return;
         }
-
-      let id = localStorage.counter ? parseInt(localStorage.counter) + 1 : 1;
-      localStorage.counter = id;
-
-      this.abastecimentos.unshift({
-        id: id,
-        km: this.km,
-        litros: this.litros,
-        valor: this.valor,
-        data: this.data
-      });
-
-      this.km = "";
-      this.litros = "";
-      this.valor = "";
-      this.data = new Date().toLocaleDateString("pt-BR");
-      this.salvaLocal();
-    },
-    salvaLocal() {
-      localStorage.setItem(
-        "abastecimentos",
-        JSON.stringify(this.abastecimentos)
-      );
-    },
-    alerta(msg) {
-      this.msgAlerta = msg;
-      this.dialogAlerta = true;
     }
   },
   data() {
-    if (!localStorage.getItem("abastecimentos")) {
-      localStorage.setItem("abastecimentos", JSON.stringify([]));
-    }
+    let ab = carregarStorage("abastecimentos");
 
-    let ab = JSON.parse(localStorage.getItem("abastecimentos"));
+    ab = ab ? ab : [];
+
     ab.sort(function(b, a) {
       let bi = parseFloat(b.km);
       let ai = parseFloat(a.km);
@@ -284,19 +238,17 @@ export default {
 .c-wrap {
   word-wrap: wrap;
 }
-.v-list-item{
-  border-bottom: 1px #673ab7 solid
+.v-list-item {
+  border-bottom: 1px #673ab7 solid;
 }
 
-.v-subheader{
-  border-bottom: 1px #673ab7 solid
+.v-subheader {
+  border-bottom: 1px #673ab7 solid;
 }
 
 @media only screen and (max-width: 400px) {
   .c-lista {
-    font-size: .7em
+    font-size: 0.7em;
   }
 }
-
-
 </style>
